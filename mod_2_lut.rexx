@@ -16,7 +16,7 @@ IF ~SHOW( 'L', library ) THEN DO
 END
 
 P61_POS=0
-instr_sel=21
+instr_sel=16
 tracks=4
 block_len=64
 ED_GETNUMPLAYSEQ var total_sequence_blocks
@@ -37,7 +37,12 @@ DO seq_pos = 1 to total_sequence_blocks /* CYCLE SEQUENCE */
 			'ED_GETDATA l' line 'INUM var instr '
 			IF instr = instr_sel THEN
 				DO
-				SAY 'NOTE: 'note' - INST: 'instr
+					SAY 'NOTE: 'note' - INST: 'instr
+				END
+			ELSE
+				DO
+					SAY 'NOTE: 0 - INST: 0'
+				END
 			END
 		END
 	END
