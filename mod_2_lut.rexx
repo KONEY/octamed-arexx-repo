@@ -3,40 +3,46 @@ Export MOD score to ASM table
 v1.0 - ARexx script by www.KONEY.org 2021
 usage: 
 Load module into OctaMED SoundStudio
-specify instrument # in hex
-run
-rx mod_2_lut.rexx >incfile.i
-include incfile.i into ASM project
+Select desired instrument
+Run this script
+file is saved in RAM:
+include instr_#_tbl.i into ASM project
 ---------------------------------------------------------
 */
 
 address OCTAMED_REXX
 options results
 op_update off
-library = 'rexxsupport.library'
+/*library = 'rexxsupport.library'
 IF ~SHOW( 'L', library ) THEN DO
 	IF ~ADDLIB( library, 0, -30, 0 ) THEN DO
 		SAY 'Failed to add library ' || library || '.'
 		EXIT 10
 	END
+END*/
+SAY 'ARexx by KONEY 2021 - v1.0'
+'IN_GETNUMBER var instr_sel'
+'IN_GETNAME var instr_name'
+file = 'RAM:instr_'||instr_sel||'_tbl.i'
+IF ~OPEN( 'MYFILE', file, 'W' ) THEN DO
+	SAY 'Failed to create file "' || file || '".'
+	EXIT 10
 END
 
+SAY 'Saving to  'file'...'
 P61_POS=0
-/*instr_sel=X2D('0B')*/
-instr_sel=13
 tracks=4
 block_len=64
 divider=16
 
-
-SAY '; Data exported with mod_2_lut.rexx by KONEY'
-SAY 'INSTR_'instr_sel'_TABLE:'
+CALL WRITELN( 'MYFILE', ';Instr: 'instr_name' | Data exported with mod_2_lut.rexx by KONEY')
+CALL WRITELN( 'MYFILE',  'INSTR_'instr_sel'_TABLE:')
 ED_GETNUMPLAYSEQ var total_sequence_blocks
 DO seq_pos = 1 to total_sequence_blocks /* CYCLE SEQUENCE */
 	'ED_GETPLAYSEQBLOCK'  seq_pos 'var cur_block'
 	'ED_GOTO B' cur_block
 	'ED_GETBLOCKNAME B' cur_block 'var block_name'
-	SAY '	; SEQ_POS 'P61_POS' - BLK# 'cur_block' - 'block_name
+	CALL WRITELN( 'MYFILE', '	; SEQ_POS 'P61_POS' - BLK# 'cur_block' - 'block_name)
 	P61_POS=seq_pos-1
 	temp_block_value=''
 	DO line = 0 to block_len-1 /* CYCLE NOTES*/
@@ -60,9 +66,12 @@ DO seq_pos = 1 to total_sequence_blocks /* CYCLE SEQUENCE */
 		END
 		/*SAY (line+1)//divider*/
 		IF (line+1)//divider=0 THEN DO
-			SAY '	DC.B '||STRIP(temp_block_value,'T',',')
+			CALL WRITELN( 'MYFILE', '	DC.B '||STRIP(temp_block_value,'T',','))
 			temp_block_value=''
 		END
 	END
 END
+CALL CLOSE( 'MYFILE' )
+SAY 'Saved !! '
 op_update on
+'wi_showstring DONE!'
