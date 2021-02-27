@@ -1,13 +1,17 @@
 /*
 Export MOD score to ASM table
 v1.0 - ARexx script by www.KONEY.org 2021
-usage: 
+USAGE: 
 Load module into OctaMED SoundStudio
 Select desired instrument
 Run this script
-file is saved in RAM:
-include instr_#_tbl.i into ASM project
+File is saved in RAM:
+Include instr_#_tbl.i into ASM project
+THEN:
+P61_Position*64 is the offset to current block in sequence
+P61_Row is the index for the value of currently triggered note, if any
 ---------------------------------------------------------
+TO DO: keep track of shorter blocks
 */
 
 address OCTAMED_REXX
@@ -29,13 +33,12 @@ IF ~OPEN( 'MYFILE', file, 'W' ) THEN DO
 	EXIT 10
 END
 
-SAY 'Saving to  'file'...'
 P61_POS=0
 tracks=4
 block_len=64
 divider=16
 
-CALL WRITELN( 'MYFILE', ';Instr: 'instr_name' | Data exported with mod_2_lut.rexx by KONEY')
+CALL WRITELN( 'MYFILE', '; 'instr_name' | Data exported with mod_2_lut.rexx by KONEY')
 CALL WRITELN( 'MYFILE',  'INSTR_'instr_sel'_TABLE:')
 ED_GETNUMPLAYSEQ var total_sequence_blocks
 DO seq_pos = 1 to total_sequence_blocks /* CYCLE SEQUENCE */
@@ -43,6 +46,7 @@ DO seq_pos = 1 to total_sequence_blocks /* CYCLE SEQUENCE */
 	'ED_GOTO B' cur_block
 	'ED_GETBLOCKNAME B' cur_block 'var block_name'
 	CALL WRITELN( 'MYFILE', '	; SEQ_POS 'P61_POS' - BLK# 'cur_block' - 'block_name)
+	SAY 'SEQ_POS 'P61_POS' - BLK# 'cur_block' - 'block_name
 	P61_POS=seq_pos-1
 	temp_block_value=''
 	DO line = 0 to block_len-1 /* CYCLE NOTES*/
@@ -72,6 +76,6 @@ DO seq_pos = 1 to total_sequence_blocks /* CYCLE SEQUENCE */
 	END
 END
 CALL CLOSE( 'MYFILE' )
-SAY 'Saved !! '
+SAY 'Saved to  'file
 op_update on
 'wi_showstring DONE!'
