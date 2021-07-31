@@ -1,13 +1,20 @@
 /* add HIGHLIGHTS every 4 beats */
 
-SAY "add HIGHLIGHT every 4 beats - v1.4"
+/*SAY "add HIGHLIGHT every 4 beats - v1.4"
 SAY "AreXX script by KONEY 2016"
-SAY "--------------------------------------------------"
+SAY "--------------------------------------------------"*/
 
 address OCTAMED_REXX
 options results
 
-divider = 4
+IF ~show(l,"rexxreqtools.library") THEN DO
+	IF ~addlib("rexxreqtools.library", 0, -30) THEN DO
+		'wi_request "Please install the rexxreqtools.library." "OK"'
+		EXIT
+	END
+END
+
+divider = 8
 gadgets= 'ALL BLOCKS|ONLY CURRENT BLOCK'
 tagstring= 'rtez_flags = ezreqf_centertext|ezreqf_noreturnkey rt_pubscrname=OCTAMED'
 selection = rtezrequest('Select ALL blocks or CURRENT block',gadgets,'Arexx by KONEY 2017 - v1.4',tagstring)
@@ -37,5 +44,5 @@ DO loop = START TO STOP
 	END
 
 END
-SAY "DONE!"
+/*SAY "DONE!"*/
 'wi_showstring DONE!'
