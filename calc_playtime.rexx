@@ -50,12 +50,12 @@ PL_PLAYBLOCK
 		/* WE NEED SOME DELAY TO ALLOW TEMPO CHANGES COMMAND TO TAKE EFFECT*/
 		call  delay delaytime_ticks
 		/* CHECK FOR TEMPO SETTINGS CHANGES*/
-		SG_GETTEMPOTPL  
+		SG_GETTEMPOTPL
 		tpl = RESULT
 		SG_GETTEMPOLPB 
 		lpb = RESULT
 		/*SAY '## TPL=' tpl*/
-		'ED_GETPLAYSEQBLOCK'  seq_pos 'var cur_block'
+		'ED_GETPLAYSEQBLOCK' seq_pos 'var cur_block'
 		'ED_GOTO b' cur_block
 		'ED_GOTO l 0'
 		ED_GETNUMLINES
